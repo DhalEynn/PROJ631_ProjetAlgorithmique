@@ -13,3 +13,4 @@ To add a bus line to the project, you will need a text file written with the fol
 * A second list of all the bus stop with 'N' as separator for the holydays/weekend
 * Each bus stop with it's holydays/weekend schedule in one direction
 * Each bus stop with it's holydays/weekend schedule in the other direction
+** Each part need to be separated by a return to the line ('\n')**
