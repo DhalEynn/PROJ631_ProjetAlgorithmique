@@ -23,6 +23,7 @@ for i in range (len(ListLines)):
     else:
         ListLines[i] = ListLines[i].rstrip()
 
-Bus.addLine(ListLines[2], ListLines[3])
+for i in range (0, len(ListLines), 2):
+    Bus.addLine(ListLines[i], ListLines[i + 1])
 
 Bus.allprintlines()

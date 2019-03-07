@@ -72,6 +72,11 @@ def arcInclusion (processedList, normalArc, holydayArc): # processedList, arcLis
         result.extend((stop, tempArc, tempHoly))
     return result
 
+
+
+
+
+
 class Reseau:
     def __init__ (self):
         self.lines = {}
@@ -91,7 +96,7 @@ class Reseau:
     def allprintlines (self):
         temp = input("Do you want the schedule of the stops ? (y or n)\n")
         for key in self.lines.keys():
-            print("Line ", key)
+            print("\nLine", key, "\n")
             for keystop in self.lines[key].stops.keys():
                 if (temp == "y"):
                     print("\n-", self.lines[key].stops[keystop].name, ":")
