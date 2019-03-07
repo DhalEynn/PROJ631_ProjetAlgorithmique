@@ -26,4 +26,7 @@ for i in range (len(ListLines)):
 for i in range (0, len(ListLines), 2):
     Bus.addLine(ListLines[i], ListLines[i + 1])
 
-Bus.allprintlines()
+#Bus.allprintlines()
+#Bus.stops["QUAI"].printArcs()
+#Bus.allprintstops()
+Bus.printStop("QUAI")

@@ -20,7 +20,7 @@ def regroupQUAIs (lines):
             if (line[i] in errors):
                 line[i] = "QUAI"
     return lines
- 
+
 def printer (lines):
     for i in lines:
         print(i)
@@ -80,19 +80,80 @@ def arcInclusion (processedList, normalArc, holydayArc): # processedList, arcLis
 class Reseau:
     def __init__ (self):
         self.lines = {}
-    
-    def addLine (self, number, path):
-        if (number in self.lines):
+        self.stops = {}
+
+    def addLine (self, lineNumber, path):
+        if (lineNumber in self.lines):
             print("\nThis line already exist")
         else:
-            self.lines[number] = Line(number, path) 
+            self.lines[lineNumber] = Line(lineNumber, path)
+            
+            path = "data/" + path + ".txt"
+            file = open(path, "r", encoding="utf-8")
+            lines = file.readlines()
+            file.close()
     
+            # Clear the \n of the file
+    
+            temp = []
+            for i in range (len(lines)):
+                if (lines[i] == '\n'):
+                    temp.insert(0, i)
+            for i in temp:
+                lines.pop(i)
+    
+            # Split the file in normal and holyday times
+    
+            numberStop = len(quickSplit(lines[0]))
+            Anormal = lines[:1+numberStop*2]
+            holydays = lines[1+numberStop*2:]
+    
+            # Cleaning the list of stops
+    
+            Anormal[0] = quickSplit(Anormal[0])
+            holydays[0] = quickSplit(holydays[0])
+    
+            # Split the lines of stops
+    
+            for i in range (1, len(Anormal)):
+                Anormal[i] = Anormal[i].split()
+            for i in range (1, len(holydays)):
+                holydays[i] = holydays[i].split()
+    
+            # Regroup the different QUAI stops
+    
+            Anormal = regroupQUAIs(Anormal)
+            holydays = regroupQUAIs(holydays)
+    
+            # Arcs creation
+    
+            AnormalArcs = arcProcessing(Anormal, numberStop)
+            holydaysArcs = arcProcessing(holydays, numberStop)
+    
+            # Arc inclusion
+    
+            inclusion = arcInclusion(Anormal, AnormalArcs, holydaysArcs)
+            for i in range(0, len(inclusion), 3):
+                self.addStop(inclusion[i], inclusion[i+1], inclusion[i+2])
+            
+            for temp in Anormal[0]:
+                self.lines[lineNumber].stops[temp] = self.stops.get(temp, temp)
+                # Adding the stops associated with the line [the (temp, temp) parameter of get is here to add an object Stops, or at least the name if not found]
+                    
+        
+    def addStop (self, name, arcs = [], holyarcs = []):
+        if (name in self.stops):
+            self.stops[name].addArc(arcs)
+            self.stops[name].addHolyarc(holyarcs)
+        else:
+            self.stops[name] = Stops(name, arcs, holyarcs)
+
     def listLines (self):
         temp = []
         for key in self.lines.keys():
             temp.append(key)
         return temp
-    
+
     def allprintlines (self):
         temp = input("Do you want the schedule of the stops ? (y or n)\n")
         for key in self.lines.keys():
@@ -103,67 +164,18 @@ class Reseau:
                     self.lines[key].stops[keystop].showStop()
                 else:
                     print("-", self.lines[key].stops[keystop].name)
-        
+    
+    def allprintstops (self):
+        for key in self.stops.keys():
+            print(self.stops[key].name)
+            print(self.stops[key].showStop())
+            
+    def printStop (self, name):
+        self.stops[name].showStop()
+
 class Line:
     def __init__ (self, number, path):
         self.stops = {}
-        self.addListStops(number, path)
-        
-    def addListStops (self, lineNumber, path):
-        path = "data/" + path + ".txt"
-        file = open(path, "r", encoding="utf-8")
-        lines = file.readlines()
-        file.close()
-        
-        # Clear the \n of the file
-        
-        temp = []
-        for i in range (len(lines)):
-            if (lines[i] == '\n'):
-                temp.insert(0, i)
-        for i in temp:
-            lines.pop(i)
-        
-        # Split the file in normal and holyday times
-        
-        numberStop = len(quickSplit(lines[0]))
-        Anormal = lines[:1+numberStop*2]
-        holydays = lines[1+numberStop*2:]
-        
-        # Cleaning the list of stops
-        
-        Anormal[0] = quickSplit(Anormal[0])
-        holydays[0] = quickSplit(holydays[0])
-        
-        # Split the lines of stops
-        
-        for i in range (1, len(Anormal)):
-            Anormal[i] = Anormal[i].split()
-        for i in range (1, len(holydays)):
-            holydays[i] = holydays[i].split()
-            
-        # Regroup the different QUAI stops
-            
-        Anormal = regroupQUAIs(Anormal)
-        holydays = regroupQUAIs(holydays)
-        
-        # Arcs creation
-        
-        AnormalArcs = arcProcessing(Anormal, numberStop)
-        holydaysArcs = arcProcessing(holydays, numberStop)
-        
-        # Arc inclusion
-        
-        inclusion = arcInclusion(Anormal, AnormalArcs, holydaysArcs)
-        for i in range(0, len(inclusion), 3):
-            self.addStop(inclusion[i], inclusion[i+1], inclusion[i+2])
-    
-    def addStop (self, name, arcs = [], holyarcs = []):
-        if (name in self.stops):
-            self.stops[name].addArc(arcs)
-            self.stops[name].addHolyarc(holyarcs)
-        else:
-            self.stops[name] = Stops(name, arcs, holyarcs)
 
 class Stops:
     def __init__ (self, name, arcs = [], holyarcs = []):
@@ -184,13 +196,15 @@ class Stops:
             for arc in holyarcs:
                 temp.append(Arcs(arc))
             self.holyarcs = temp
-        
-    def addArc (self, arc):
-        self.arcs.append(Arcs(arc))
-        
-    def addHolyarc (self, holyarc):
-        self.holyarcs.append(Arcs(holyarc))
-    
+
+    def addArc (self, arclist):
+        for arc in arclist:
+            self.arcs.append(Arcs(arc))
+
+    def addHolyarc (self, holyarclist):
+        for holyarc in holyarclist:
+            self.holyarcs.append(Arcs(holyarc))
+
     def showStop (self):
         if (self.arcs != []):
             i = 0
@@ -223,6 +237,7 @@ class Stops:
                 if (temp != arc.getDest()):
                     i = 0
                     temp = arc.getDest()
+                    print('')
                     print("\n     Direction", temp)
                     print(end = '     ')
                 if (i == 4):
@@ -233,9 +248,16 @@ class Stops:
                     i += 1
                     print(arc.getTimeStop(), end = ' ')
             print('')
-                
-            
-        
+    
+    def printArcs (self):
+        for arc in self.arcs:
+            arc.printer()
+    
+    def printHolyarcs (self):
+        for arc in self.holyarcs:
+            arc.printer()
+
+
 class Arcs:
     def __init__ (self, arc):
         self.comeFrom = arc[0]
@@ -244,12 +266,12 @@ class Arcs:
         self.end = arc[3]
         self.mass = arc[4]
         self.EOL = arc[5] #End of line
-    
+
     def printer (self):
         print(self.comeFrom, self.goto, self.start, self.end, self.mass, self.EOL)
-    
+
     def getTimeStop (self):
         return self.start
-    
+
     def getDest (self):
         return self.EOL
