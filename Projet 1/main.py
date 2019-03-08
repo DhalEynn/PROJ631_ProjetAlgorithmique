@@ -6,7 +6,17 @@ Created on Mon Mar  4 14:18:45 2019
 """
 
 import reseau
-Bus = reseau.Reseau()
+import algorithms
+
+# Initialisation
+
+errors = ["LYCÉE_DE_POISY"]
+Bus = reseau.Reseau(errors)
+
+
+"""
+    Main program ==============================================================
+"""
 
 # Open the list of the different lines
 
@@ -23,10 +33,12 @@ for i in range (len(ListLines)):
     else:
         ListLines[i] = ListLines[i].rstrip()
 
+# Creating the lines
+
 for i in range (0, len(ListLines), 2):
     Bus.addLine(ListLines[i], ListLines[i + 1])
 
-#Bus.allprintlines()
-#Bus.stops["QUAI"].printArcs()
-#Bus.allprintstops()
-Bus.printStop("QUAI")
+# Calls
+
+Bus.allprintlines()
+toTake = algorithms.princ(Bus, "PISCINE-PATINOIRE", "CAMPUS", "07:45", False)
