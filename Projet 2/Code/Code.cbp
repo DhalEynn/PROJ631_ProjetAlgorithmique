@@ -21,6 +21,8 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
+		<Unit filename="tree.cpp" />
+		<Unit filename="tree.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

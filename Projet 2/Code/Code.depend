@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1556632810 source:d:\autres documents\_travail\3eme annee\ue601 - mathématiques et algorithmique\proj631 - projet algorithmique\tps\projet 2\code\main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<dirent.h>
+	<map>
+	<algorithm>
+	<vector>
+	"tree.h"
+
+1556632514 source:d:\autres documents\_travail\3eme annee\ue601 - mathématiques et algorithmique\proj631 - projet algorithmique\tps\projet 2\code\tree.cpp
+	<iostream>
+	"tree.h"
+
+1556026510 d:\autres documents\_travail\3eme annee\ue601 - mathématiques et algorithmique\proj631 - projet algorithmique\tps\projet 2\code\tree.cpp
+	<iostream>
+
+1556633906 d:\autres documents\_travail\3eme annee\ue601 - mathématiques et algorithmique\proj631 - projet algorithmique\tps\projet 2\code\tree.h
+
